@@ -14,6 +14,7 @@
 		E739D19D2F47EF9100E59593 /* RxDataSources in Frameworks */ = {isa = PBXBuildFile; productRef = E739D19C2F47EF9100E59593 /* RxDataSources */; };
 		E739D1A02F47EF9F00E59593 /* Then in Frameworks */ = {isa = PBXBuildFile; productRef = E739D19F2F47EF9F00E59593 /* Then */; };
 		E739D1A32F47EFB600E59593 /* Kingfisher in Frameworks */ = {isa = PBXBuildFile; productRef = E739D1A22F47EFB600E59593 /* Kingfisher */; };
+		E739D2F72F4953E700E59593 /* ReusableKit in Frameworks */ = {isa = PBXBuildFile; productRef = E739D2F62F4953E700E59593 /* ReusableKit */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -81,6 +82,7 @@
 				E739D1982F47EF7B00E59593 /* Alamofire in Frameworks */,
 				E739D1922F47EF6700E59593 /* ReactorKit in Frameworks */,
 				E739D19D2F47EF9100E59593 /* RxDataSources in Frameworks */,
+				E739D2F72F4953E700E59593 /* ReusableKit in Frameworks */,
 				E739D1952F47EF7200E59593 /* SnapKit in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -149,6 +151,7 @@
 				E739D19C2F47EF9100E59593 /* RxDataSources */,
 				E739D19F2F47EF9F00E59593 /* Then */,
 				E739D1A22F47EFB600E59593 /* Kingfisher */,
+				E739D2F62F4953E700E59593 /* ReusableKit */,
 			);
 			productName = kurlyGithubSearch;
 			productReference = E739D1312F47EC5600E59593 /* kurlyGithubSearch.app */;
@@ -239,6 +242,7 @@
 				E739D1992F47EF9100E59593 /* XCRemoteSwiftPackageReference "RxDataSources" */,
 				E739D19E2F47EF9F00E59593 /* XCRemoteSwiftPackageReference "Then" */,
 				E739D1A12F47EFB600E59593 /* XCRemoteSwiftPackageReference "Kingfisher" */,
+				E739D2F52F4953E700E59593 /* XCRemoteSwiftPackageReference "ReusableKit" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = E739D1322F47EC5600E59593 /* Products */;
@@ -321,11 +325,12 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = TW2AJZ2BN6;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = kurlyGithubSearch/Info.plist;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
-				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen.storyboard;
-				INFOPLIST_KEY_UIMainStoryboardFile = Main;
+				INFOPLIST_KEY_UILaunchStoryboardName = "";
+				INFOPLIST_KEY_UIMainStoryboardFile = "";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
 				IPHONEOS_DEPLOYMENT_TARGET = 18;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -356,11 +361,12 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = TW2AJZ2BN6;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = kurlyGithubSearch/Info.plist;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
-				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen.storyboard;
-				INFOPLIST_KEY_UIMainStoryboardFile = Main;
+				INFOPLIST_KEY_UILaunchStoryboardName = "";
+				INFOPLIST_KEY_UIMainStoryboardFile = "";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
 				IPHONEOS_DEPLOYMENT_TARGET = 18;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -673,6 +679,14 @@
 				minimumVersion = 8.7.0;
 			};
 		};
+		E739D2F52F4953E700E59593 /* XCRemoteSwiftPackageReference "ReusableKit" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/devxoul/ReusableKit.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 4.0.0;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -710,6 +724,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = E739D1A12F47EFB600E59593 /* XCRemoteSwiftPackageReference "Kingfisher" */;
 			productName = Kingfisher;
+		};
+		E739D2F62F4953E700E59593 /* ReusableKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = E739D2F52F4953E700E59593 /* XCRemoteSwiftPackageReference "ReusableKit" */;
+			productName = ReusableKit;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

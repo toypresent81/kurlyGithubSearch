@@ -58,13 +58,13 @@ private extension SplashViewController {
     
     // MARK: - View Layout
     func setupConstraints() {
-        appNameLabel.snp.makeConstraints { make in
-            make.center.equalToSuperview()
+        appNameLabel.snp.makeConstraints {
+            $0.center.equalToSuperview()
         }
         
-        authorLabel.snp.makeConstraints { make in
-            make.bottom.equalTo(view.safeAreaLayoutGuide).inset(20)
-            make.trailing.equalToSuperview().inset(20)
+        authorLabel.snp.makeConstraints {
+            $0.bottom.equalTo(view.safeAreaLayoutGuide).inset(20)
+            $0.trailing.equalToSuperview().inset(20)
         }
     }
 }
@@ -86,11 +86,10 @@ extension SplashViewController: ReactorKit.View {
             .delay(.milliseconds(2500), scheduler: MainScheduler.instance)
             .subscribe(onNext: { [weak self] _ in
                 guard let self = self else { return }
-                let searchViewController = SearchViewController()
+                let searchViewController = SearchViewController()                
                 let navigationController = UINavigationController(rootViewController: searchViewController)
                 navigationController.modalPresentationStyle = .fullScreen
                 navigationController.modalTransitionStyle = .crossDissolve
-                
                 self.present(navigationController, animated: true)
             })
             .disposed(by: disposeBag)
