@@ -84,14 +84,17 @@ extension SplashViewController: ReactorKit.View {
         reactor.state.map { $0.appNameAlpha }
             .filter { $0 == 1 }
             .delay(.milliseconds(2500), scheduler: MainScheduler.instance)
-            .subscribe(onNext: { [weak self] _ in
-                guard let self = self else { return }
-                let searchViewController = SearchViewController()                
-                let navigationController = UINavigationController(rootViewController: searchViewController)
-                navigationController.modalPresentationStyle = .fullScreen
-                navigationController.modalTransitionStyle = .crossDissolve
-                self.present(navigationController, animated: true)
+            .subscribe(onNext: { _ in
+                if let windowScene = UIApplication.shared.connectedScenes
+                    .compactMap({ $0 as? UIWindowScene })
+                    .first(where: { $0.activationState == .foregroundActive }),
+                   let window = windowScene.windows.first(where: { $0.isKeyWindow }) {
+                    let searchViewController = SearchViewController()
+                    window.rootViewController = UINavigationController(rootViewController: searchViewController)
+                    window.makeKeyAndVisible()
+                }
             })
             .disposed(by: disposeBag)
     }
 }
+

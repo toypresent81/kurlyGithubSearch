@@ -19,9 +19,13 @@ final class SearchViewController: UIViewController {
     //MARK: - UI
     lazy var tableView = BaseTableView().then {
         $0.register(Reusable.searchRecentCell)
+        $0.register(Reusable.searchResultCell)
+        $0.register(Reusable.loadingCell)
     }
     struct Reusable {
         static let searchRecentCell = ReusableCell<SearchRecentCell>()
+        static let searchResultCell = ReusableCell<SearchResultCell>()
+        static let loadingCell = ReusableCell<LoadingCell>()
     }
 
     lazy var searchController = UISearchController(searchResultsController: nil).then {
@@ -36,7 +40,10 @@ final class SearchViewController: UIViewController {
     // MARK: - Initializing
     init() {
         let localRepository = SearchLocalRepository()
-        defer { self.reactor = Reactor(localRepository: localRepository) }
+        let networkManager = NetworkManager()
+        let searchService = SearchService(networkManager: networkManager)
+        
+        defer { self.reactor = Reactor(localRepository: localRepository, searchService: searchService) }
         super.init(nibName: nil, bundle: nil)
     }
     
@@ -50,18 +57,41 @@ final class SearchViewController: UIViewController {
         self.setupUI()
         self.setupConstraints()
         self.setupSearchController()
+        self.configureNavigationBar()
+    }
+    
+    private func configureNavigationBar() {
+        navigationController?.navigationBar.prefersLargeTitles = true
+        navigationItem.largeTitleDisplayMode = .always
+
+        // iOS 26 대응: transparent background
+        let appearance = UINavigationBarAppearance()
+        if #available(iOS 26.0, *) {
+            appearance.configureWithTransparentBackground() // Large Title 안보이는 이슈 수정
+        } else {
+            // iOS 26이사 투명 배경이면 search bar 뒤쪽이 보여서 opaque 사용
+            appearance.configureWithOpaqueBackground()
+            appearance.backgroundColor = .systemBackground
+        }
+        appearance.largeTitleTextAttributes = [.foregroundColor: UIColor.label]
+        appearance.titleTextAttributes = [.foregroundColor: UIColor.label]
+
+        appearance.shadowColor = .clear
+        appearance.shadowImage = UIImage()
+        
+        navigationController?.navigationBar.standardAppearance = appearance
+        navigationController?.navigationBar.scrollEdgeAppearance = appearance
+        navigationController?.navigationBar.compactAppearance = appearance
     }
 }
 
 private extension SearchViewController {
-    // MARK: - setupUI
     func setupUI() {
         view.backgroundColor = .white
         view.addSubview(tableView)
     }
     
-    // MARK: - View Layout
-    func setupConstraints() {
+    private func setupConstraints() {
         tableView.snp.makeConstraints {
             $0.edges.equalToSuperview()
         }

@@ -14,23 +14,23 @@ import RxCocoa
 final class SearchRecentCell: BaseTableViewCell {
     
     //MARK: - UI
-    private let titleLabel = UILabel().then {
-        $0.font = .systemFont(ofSize: 16)
-        $0.textColor = .gray
+    private let titleLabel = UILabel().then { // 타이틀
+        $0.font = .boldSystemFont(ofSize: 16)
+        $0.textColor = .darkGray
     }
-    private let dateLabel = UILabel().then {
+    private let dateLabel = UILabel().then { // 날짜
         $0.font = .systemFont(ofSize: 12)
         $0.textColor = .gray
     }
     
-    private let deleteButton = UIButton(type: .system).then {
+    private let deleteButton = UIButton(type: .system).then { // 삭제버튼
         $0.setImage(UIImage(systemName: "xmark.circle.fill"), for: .normal)
         $0.tintColor = .systemGray4
     }
     
     var deleteAction: (() -> Void)?
     
-    // MARK: Initializing
+    // MARK: - Initializing
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: .value1, reuseIdentifier: reuseIdentifier)
         self.setupUI()
@@ -66,8 +66,8 @@ extension SearchRecentCell {
     
     func setupConstraints() {
         titleLabel.snp.makeConstraints {
+            $0.top.bottom.equalToSuperview().inset(16)
             $0.leading.equalToSuperview().inset(20)
-            $0.centerY.equalToSuperview()
         }
         
         deleteButton.snp.makeConstraints {
@@ -82,7 +82,7 @@ extension SearchRecentCell {
     }
     
     func setupObservble() {
-        self.deleteButton.rx.tap
+        self.deleteButton.rx.tap // 개별 삭제버튼 이벤트
             .throttle(.milliseconds(300), scheduler: MainScheduler.asyncInstance)
             .observe(on: MainScheduler.asyncInstance)
             .subscribe(onNext: { [weak self] _ in

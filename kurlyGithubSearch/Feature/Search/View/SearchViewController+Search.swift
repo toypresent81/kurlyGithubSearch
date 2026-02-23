@@ -16,14 +16,25 @@ extension SearchViewController {
     func bindSearch(reactor: Reactor) {
         // 검색어 입력
         searchController.searchBar.rx.text.orEmpty
-            .distinctUntilChanged()
-            .map { Reactor.Action.updateQuery($0) }
+            .map { text -> SearchViewReactor.Action in
+                if text.isEmpty {
+                    return .cancelSearch
+                } else {
+                    return .updateQuery(text)
+                }
+            }
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
 
         // 검색 버튼 클릭
         searchController.searchBar.rx.searchButtonClicked
             .map { Reactor.Action.search }
+            .bind(to: reactor.action)
+            .disposed(by: disposeBag)
+        
+        // 취소 버튼 클릭
+        searchController.searchBar.rx.cancelButtonClicked
+            .map { SearchViewReactor.Action.cancelSearch }
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
     }
