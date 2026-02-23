@@ -29,22 +29,22 @@ extension SearchViewController {
             .subscribe(onNext: { [weak self] item in
                 
                 switch item {
-                    
                 case .recent(let entity):
                     guard let keyword = entity.keyword else { return }
                     self?.searchController.searchBar.text = keyword
                     reactor.action.onNext(.updateQuery(keyword))
-                    reactor.action.onNext(.search)
+                    reactor.action.onNext(.search(keyword))
                     
                 case .autoComplete(let entity):
-                    self?.searchController.searchBar.text = entity.keyword
-                    reactor.action.onNext(.search)
+                    guard let keyword = entity.keyword else { return }
+                    self?.searchController.searchBar.text = keyword
+                    reactor.action.onNext(.search(keyword))
                     
                 case .result(let repo):
                     let webVC = WebViewController(urlString: repo.htmlURL)
                     self?.navigationController?.pushViewController(webVC, animated: true)
                     
-                case .loading:
+                case .loading, .empty:
                     break
                 }
             })
@@ -76,7 +76,6 @@ private extension SearchViewController {
         return .init(
             configureCell: { [weak self] dataSource, tableView, indexPath, sectionItem in
                 
-                
                 switch sectionItem {
                 case .recent(let entity):
                     let cell = tableView.dequeue(Reusable.searchRecentCell, for: indexPath)
@@ -101,6 +100,9 @@ private extension SearchViewController {
                 case .loading:
                     let cell = tableView.dequeue(Reusable.loadingCell, for: indexPath)
                     cell.configure()
+                    return cell
+                case .empty:
+                    let cell = tableView.dequeue(Reusable.emptyCell, for: indexPath)
                     return cell
                 }
             }

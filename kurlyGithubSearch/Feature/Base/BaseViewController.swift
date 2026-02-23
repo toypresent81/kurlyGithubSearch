@@ -1,10 +1,10 @@
+////
+////  BaseViewController.swift
+////  kurlyGithubSearch
+////
+////  Created by toypresent on 2/20/26.
+////
 //
-//  BaseViewController.swift
-//  kurlyGithubSearch
-//
-//  Created by toypresent on 2/20/26.
-//
-
 //import UIKit
 //import RxSwift
 //
@@ -19,14 +19,7 @@
 //        
 //    // MARK: Initializing
 //    init(
-//        
-//        backgroundImageColor: UIColor? = UIColor.white,
-//        prefersHidden: Bool? = nil,
-//        isTranslucent: Bool? = nil,
-//        automaticallyAdjustsLeftBarButtonItem: Bool = true,
-//        backgroundViewColor: UIColor = UIColor.white
 //    ) {
-//        self.backgroundColor = backgroundViewColor
 //        super.init(nibName: nil, bundle: nil)
 //    }
 //    
@@ -53,36 +46,7 @@
 //    
 //    override func viewWillAppear(_ animated: Bool) {
 //        super.viewWillAppear(animated)
-//        self.navigationController?.setNavigationBarHidden(self.navigationBarData.prefersHidden, animated: true)
-//        self.navigationController?.hideHairline()
-//        self.setNavigationBar(
-//            isTranslucent: self.navigationBarData.isTranslucent,
-//            backgroundImageColor: self.navigationBarData.barBackgroundImageColor
-//        )
 //    }
-//    
-//    override func updateViewConstraints() {
-//        if !self.didSetupConstraints {
-//            self.setupConstraints()
-//            self.didSetupConstraints = true
-//        }
-//        super.updateViewConstraints()
-//    }
-//    
-//    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
-//        // Trait collection has already changed
-//        self.setNavigationBar(
-//            isTranslucent: self.navigationBarData.isTranslucent,
-//            backgroundImageColor: self.navigationBarData.barBackgroundImageColor
-//        )
-//        self.setNeedsStatusBarAppearanceUpdate()
-//    }
-//    
-//    func setupConstraints() {
-//        // Override point
-//    }
-//    
-//    
 //}
 //
 //extension BaseViewController {
@@ -102,59 +66,3 @@
 //        }
 //    }
 //}
-//
-//extension BaseViewController {
-//    // MARK: cancelButtonDidTap
-//    @objc func cancelButtonDidTap() {
-//        self.dismiss(animated: true, completion: {
-//            NotificationCenter.default.post(name: Notification.createName(.closeModal), object: nil)
-//        })
-//    }
-//    
-//    @objc func backAction() {
-//        self.navigationController?.popViewController(animated: true)
-//    }
-//    
-//    // MARK: addDismissKeyboardGesture
-//    func addDismissKeyboardGesture(){
-//        self.view.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(self.endEditing)))
-//    }
-//    
-//    // MARK: Adjusting Navigation Item
-//    func adjustLeftBarButtonItem() {
-//        let tintColor: UIColor = ColorPaletteV2.button.color(index: .backgroundActive)
-//        if self.navigationController?.viewControllers.count ?? 0 > 1 { // pushed
-//            let backButton = UIButton.drawNavigationLeftButton(
-//                image: Asset.Images.Back.icBack.image,
-//                target: self,
-//                selector: #selector(backAction),
-//                tintColor:  tintColor
-//            )
-//            self.navigationItem.leftBarButtonItem = UIBarButtonItem(customView: backButton)
-//
-//        } else if self.presentingViewController != nil { // presented
-//            
-//            dismissButton = UIButton.drawNavigationLeftButton(
-//                image: Asset.Images.icClose.image,
-//                target: self,
-//                selector: #selector(cancelButtonDidTap),
-//                tintColor:  tintColor
-//            )
-//            
-//            self.navigationItem.leftBarButtonItem = UIBarButtonItem(customView: dismissButton)
-//        }
-//    }
-//    
-//    func freeze() {
-//        self.view.isUserInteractionEnabled = false
-//        self.navigationController?.navigationBar.isUserInteractionEnabled = false
-//        self.navigationController?.interactivePopGestureRecognizer?.isEnabled = false
-//    }
-//    
-//    func unfreeze() {
-//        self.view.isUserInteractionEnabled = true
-//        self.navigationController?.navigationBar.isUserInteractionEnabled = true
-//        self.navigationController?.interactivePopGestureRecognizer?.isEnabled = true
-//    }
-//}
-//

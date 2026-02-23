@@ -21,17 +21,23 @@ final class SearchViewController: UIViewController {
         $0.register(Reusable.searchRecentCell)
         $0.register(Reusable.searchResultCell)
         $0.register(Reusable.loadingCell)
+        $0.register(Reusable.emptyCell)
     }
     struct Reusable {
         static let searchRecentCell = ReusableCell<SearchRecentCell>()
         static let searchResultCell = ReusableCell<SearchResultCell>()
         static let loadingCell = ReusableCell<LoadingCell>()
+        static let emptyCell = ReusableCell<SearchEmptyCell>()
     }
 
     lazy var searchController = UISearchController(searchResultsController: nil).then {
         $0.searchBar.placeholder = "저장소 검색"
         $0.obscuresBackgroundDuringPresentation = false
         $0.searchBar.tintColor = .systemPurple
+    }
+    let indicator = UIActivityIndicatorView(style: .large).then {
+        $0.hidesWhenStopped = true
+        $0.color = .systemPurple
     }
         
     // MARK: Rx
@@ -89,11 +95,17 @@ private extension SearchViewController {
     func setupUI() {
         view.backgroundColor = .white
         view.addSubview(tableView)
+        view.addSubview(indicator)
     }
     
     private func setupConstraints() {
         tableView.snp.makeConstraints {
             $0.edges.equalToSuperview()
+        }
+        indicator.snp.makeConstraints {
+            $0.centerX.equalToSuperview()
+            $0.centerY.equalToSuperview()
+            $0.size.equalTo(60)
         }
     }
     
@@ -103,13 +115,27 @@ private extension SearchViewController {
         navigationItem.hidesSearchBarWhenScrolling = false
         definesPresentationContext = true
         navigationItem.searchController = searchController
+        
+        let textField = searchController.searchBar.searchTextField
+        textField.autocapitalizationType = .none
+        textField.autocorrectionType = .no
+        textField.spellCheckingType = .no
     }
 }
 
 // MARK: - Bind
 extension SearchViewController: ReactorKit.View {
     func bind(reactor: Reactor) {
+        reactor.state
+            .map { $0.isLoading }
+            .distinctUntilChanged()
+            .bind(to: indicator.rx.isAnimating)
+            .disposed(by: disposeBag)
+        
         bindSearch(reactor: reactor)
         bindTableView(reactor: reactor)
+        
+        
+
     }
 }

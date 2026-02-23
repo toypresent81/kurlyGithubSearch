@@ -15,17 +15,15 @@ final class SearchRecentCell: BaseTableViewCell {
     
     //MARK: - UI
     private let titleLabel = UILabel().then { // 타이틀
-        $0.font = .boldSystemFont(ofSize: 16)
+        $0.font = .systemFont(ofSize: 16)
         $0.textColor = .darkGray
     }
     private let dateLabel = UILabel().then { // 날짜
         $0.font = .systemFont(ofSize: 12)
         $0.textColor = .gray
     }
-    
-    private let deleteButton = UIButton(type: .system).then { // 삭제버튼
-        $0.setImage(UIImage(systemName: "xmark.circle.fill"), for: .normal)
-        $0.tintColor = .systemGray4
+    private let deleteButton = UIButton(type: .custom).then { // 삭제버튼
+        $0.setImage(UIImage(named: "delete_button"), for: .normal)
     }
     
     var deleteAction: (() -> Void)?

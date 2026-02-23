@@ -72,6 +72,7 @@ Feature
  │   │   ├─ SearchViewController+Search
  │   │   ├─ SearchViewController+TableView
  │   │   ├─ SearchRecentCell
+ │   │   ├─ SearchEmptyCell
  │   │   ├─ SearchHeaderView
  │   │   ├─ SearchRecentFooterView
  │   │   └─ SearchResultCell
@@ -98,8 +99,6 @@ Data
 
 ## 사용 기술
 
-- Swift, UIKit
-- ReactorKit
+- Swift, UIKit, RxSwift
+- ReactorKit, SnapKit, WebKit
 - CoreData
-- SnapKit
-- WebKit

@@ -50,4 +50,5 @@ enum SearchSectionItem {
     case autoComplete(RecentSearchEntity)
     case result(Repository)
     case loading
+    case empty
 }

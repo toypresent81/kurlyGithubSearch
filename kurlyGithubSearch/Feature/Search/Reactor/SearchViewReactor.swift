@@ -15,7 +15,7 @@ final class SearchViewReactor: Reactor {
     // MARK: - Action
     enum Action {
         case updateQuery(String)
-        case search
+        case search(String)
         case deleteRecent(String)
         case deleteAllRecent
         
@@ -82,7 +82,6 @@ final class SearchViewReactor: Reactor {
                 let recent = localRepository.fetchRecent(count: Constant.recentFetchCount)
                 return .concat([
                     .just(.setQuery(query)),
-                    .just(.setSearching(false)),
                     .just(.setRepositories([], totalCount: 0, page: 1, append: false)),
                     .just(.setRecent(recent))
                 ])
@@ -90,7 +89,6 @@ final class SearchViewReactor: Reactor {
                 let autoComplete = localRepository.fetchAutocomplete(keyword: query)
                 return .concat([
                     .just(.setQuery(query)),
-                    .just(.setSearching(true)),
                     .just(.setAutoComplete(autoComplete))
                 ])
             }
@@ -104,19 +102,20 @@ final class SearchViewReactor: Reactor {
             if let cachedRepos = searchResultCache[query], let totalCount = totalCountCache[query] { // 캐시확인
                 return .just(.setRepositories(cachedRepos, totalCount: totalCount, page: 1, append: false))
             }
-            
+                        
             return .concat([
+                .just(.setQuery(query)),
                 .just(.setSearching(true)),
                 .just(.setLoading(true)),
                 .just(.setRepositories([], totalCount: 0, page: 1, append: false)),
-                
                 searchService.searchRepositories(keyword: query, page: 1)
                     .map { [weak self] response in
                         self?.searchResultCache[query] = response.items
                         self?.totalCountCache[query] = response.totalCount
                         return .setRepositories(response.items, totalCount: response.totalCount, page: 1, append: false)
                     }
-                    .asObservable()
+                    .asObservable(),
+                .just(.setLoading(false))
             ])
             
         case let .deleteRecent(keyword):
@@ -129,7 +128,6 @@ final class SearchViewReactor: Reactor {
             return .just(.setRecent([]))
             
         case .loadNextPage:
-            
             guard !currentState.isLoading, currentState.hasNextPage else {
                 return .empty()
             }
@@ -149,10 +147,10 @@ final class SearchViewReactor: Reactor {
                             append: true
                         )
                     }
-                    .asObservable()
+                    .asObservable(),
+                    .just(.setLoading(false))
             ])
         case .cancelSearch: // 서치바 취소 이벤트
-
             let recent = localRepository.fetchRecent(count: Constant.recentFetchCount)
 
             return .concat([
@@ -173,23 +171,21 @@ final class SearchViewReactor: Reactor {
             
         case let .setRecent(recent):
             newState.recentKeywords = recent
-            if !newState.isSearching {
+            if newState.query.isEmpty {
                 newState.sections = recent.isEmpty ? [] : [.recent(recent)]
             }
-            
+
         case let .setAutoComplete(auto):
             newState.autoCompleteKeywords = auto
-            if newState.isSearching {
+            if !newState.isSearching {
                 newState.sections = auto.isEmpty ? [] : [.autoComplete(auto)]
             }
-            
+
         case let .setSearching(isSearching):
             newState.isSearching = isSearching
 
         case let .setLoading(isLoading):
             newState.isLoading = isLoading
-            
-            makeResultSection(state: &newState)            
             
         case let .setRepositories(repos, totalCount, page, append):
             if append {
@@ -203,8 +199,6 @@ final class SearchViewReactor: Reactor {
 
             let maxCount = min(totalCount, 1000) // 검색 1000개 제한때문에 설정
             newState.hasNextPage = newState.repositories.count < maxCount
-
-            newState.isLoading = false
             makeResultSection(state: &newState)
         }
         
@@ -212,14 +206,19 @@ final class SearchViewReactor: Reactor {
     }
     
     private func makeResultSection(state: inout State) {
-        var items = state.repositories.map {
-            SearchSectionItem.result($0)
-        }
+        var items: [SearchSectionItem] = []
 
-        if state.isLoading && state.hasNextPage {
-            items.append(.loading)
-        }
+        if state.repositories.isEmpty && !state.isLoading {
+            items = [.empty]
+        } else {
+            items = state.repositories.map {
+                .result($0)
+            }
 
+            if state.isLoading && state.hasNextPage {
+                items.append(.loading)
+            }
+        }
         state.sections = [.result(items)]
     }
 }
