@@ -47,7 +47,7 @@ iOS용 GitHub 저장소 검색 사전과제입니다.
 ```text
 App
  ├─ AppDelegate
- ├─ DIContainer (optional)
+ ├─ SceneDelegate
  ├─ Resources
  │   ├─ Assets
  │   ├─ Extensions
@@ -55,33 +55,37 @@ App
  │       └─ API
 
 Feature
+ ├─ Base
+ │   ├─ BaseView
+ │   ├─ BaseTableView
+ │   └─ BaseTableViewCell
+ ├─ Common
+ │   └─ LoadingCell
  ├─ Splash
- │   └─ SplashViewController
+ │   ├─ View
+ │   │   └─ SplashViewController
+ │   ├─ Reactor
+ │   │   └─ SplashViewReactor
  ├─ Search
  │   ├─ View
  │   │   ├─ SearchViewController
- │   │   ├─ SearchListTableView
- │   │   └─ SearchListCell
+ │   │   ├─ SearchViewController+Search
+ │   │   ├─ SearchViewController+TableView
+ │   │   ├─ SearchRecentCell
+ │   │   ├─ SearchHeaderView
+ │   │   ├─ SearchRecentFooterView
+ │   │   └─ SearchResultCell
  │   ├─ Reactor
- │   │   ├─ SearchReactor.swift
- │   │   ├─ SearchReactor+Action.swift
- │   │   ├─ SearchReactor+Mutation.swift
- │   │   └─ SearchReactor+Pagination.swift
- │   ├─ Model
- │   │   └─ SearchResultModel
+ │   │   └─ SearchViewReactor
  │   └─ Section
  │       └─ SearchSection
-
-Models
- ├─ Entity
- │   └─ SearchRecentEntity
- ├─ UseCase
- │   └─ SearchRecentUseCase
+ ├─ WebView
+ │   └─ WebViewController
 
 Data
  ├─ CoreData
  │   ├─ CoreDataManager
- │   └─ SearchLocalRepository  (Protocol + 구현체 상단 정의)
+ │   └─ SearchLocalRepository
  ├─ Network
  │   ├─ NetworkManager
  │   ├─ Services
@@ -97,6 +101,5 @@ Data
 - Swift, UIKit
 - ReactorKit
 - CoreData
-- NetworkManager
-- SnapKit (UI 레이아웃)
-- WebKit (WebView)
+- SnapKit
+- WebKit
