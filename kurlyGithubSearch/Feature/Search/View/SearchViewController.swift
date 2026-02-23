@@ -127,7 +127,9 @@ private extension SearchViewController {
 extension SearchViewController: ReactorKit.View {
     func bind(reactor: Reactor) {
         reactor.state
-            .map { $0.isLoading }
+            .map { state in
+                state.isLoading && state.repositories.isEmpty
+            }
             .distinctUntilChanged()
             .bind(to: indicator.rx.isAnimating)
             .disposed(by: disposeBag)

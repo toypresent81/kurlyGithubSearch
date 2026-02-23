@@ -70,7 +70,7 @@ final class SearchViewReactor: Reactor {
         
         self.initialState = State(
             recentKeywords: recent,
-            sections: [.recent(recent)]
+            sections: recent.isEmpty ? [.result([.empty])] : [.recent(recent)]
         )
     }
     
@@ -187,6 +187,10 @@ final class SearchViewReactor: Reactor {
         case let .setLoading(isLoading):
             newState.isLoading = isLoading
             
+            if !isLoading && newState.isSearching {
+                makeResultSection(state: &newState, isLoading: isLoading)
+            }
+            
         case let .setRepositories(repos, totalCount, page, append):
             if append {
                 newState.repositories += repos
@@ -199,23 +203,21 @@ final class SearchViewReactor: Reactor {
 
             let maxCount = min(totalCount, 1000) // 검색 1000개 제한때문에 설정
             newState.hasNextPage = newState.repositories.count < maxCount
-            makeResultSection(state: &newState)
+            makeResultSection(state: &newState, isLoading: newState.isLoading)
         }
         
         return newState
     }
     
-    private func makeResultSection(state: inout State) {
+    private func makeResultSection(state: inout State, isLoading: Bool? = nil) {
+        let loadingState = isLoading ?? state.isLoading
         var items: [SearchSectionItem] = []
 
-        if state.repositories.isEmpty && !state.isLoading {
+        if state.repositories.isEmpty && !loadingState {
             items = [.empty]
         } else {
-            items = state.repositories.map {
-                .result($0)
-            }
-
-            if state.isLoading && state.hasNextPage {
+            items = state.repositories.map { .result($0) }
+            if loadingState && state.hasNextPage {
                 items.append(.loading)
             }
         }

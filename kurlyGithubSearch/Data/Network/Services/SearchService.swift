@@ -31,7 +31,8 @@ final class SearchService: SearchServiceType {
         
         let parameters: Parameters = [
             "q": keyword,
-            "page": page
+            "page": page,
+            "per_page": 100
         ]
         
         return networkManager.request(
