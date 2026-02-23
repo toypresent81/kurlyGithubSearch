@@ -8,7 +8,7 @@
 import RxDataSources
 
 enum SearchSection {
-    case recent([RecentSearchEntity])
+    case recent([SearchSectionItem])
     case autoComplete([RecentSearchEntity])
     case result([SearchSectionItem])
 }
@@ -19,7 +19,7 @@ extension SearchSection: SectionModelType {
     var items: [SearchSectionItem] {
         switch self {
         case .recent(let items):
-            return items.map { .recent($0) }
+            return items
         case .autoComplete(let items):
             return items.map { .autoComplete($0) }
         case .result(let items):
@@ -30,10 +30,7 @@ extension SearchSection: SectionModelType {
     init(original: SearchSection, items: [SearchSectionItem]) {
         switch original {
         case .recent:
-            self = .recent(items.compactMap {
-                if case let .recent(entity) = $0 { return entity }
-                return nil
-            })
+            self = .recent(items)
         case .autoComplete:
             self = .autoComplete(items.compactMap {
                 if case let .autoComplete(entity) = $0 { return entity }
@@ -51,4 +48,5 @@ enum SearchSectionItem {
     case result(Repository)
     case loading
     case empty
+    case emptyRecent
 }

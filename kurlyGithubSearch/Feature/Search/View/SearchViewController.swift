@@ -22,12 +22,14 @@ final class SearchViewController: UIViewController {
         $0.register(Reusable.searchResultCell)
         $0.register(Reusable.loadingCell)
         $0.register(Reusable.emptyCell)
+        $0.register(Reusable.recentEmptyCell)
     }
     struct Reusable {
         static let searchRecentCell = ReusableCell<SearchRecentCell>()
         static let searchResultCell = ReusableCell<SearchResultCell>()
         static let loadingCell = ReusableCell<LoadingCell>()
         static let emptyCell = ReusableCell<SearchEmptyCell>()
+        static let recentEmptyCell = ReusableCell<SearchRecentEmptyCell>()
     }
 
     lazy var searchController = UISearchController(searchResultsController: nil).then {

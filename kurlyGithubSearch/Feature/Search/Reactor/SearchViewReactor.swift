@@ -67,10 +67,10 @@ final class SearchViewReactor: Reactor {
         self.searchService = searchService
         
         let recent = localRepository.fetchRecent(count: Constant.recentFetchCount)
-        
+        let items = recent.map { SearchSectionItem.recent($0) }
         self.initialState = State(
             recentKeywords: recent,
-            sections: recent.isEmpty ? [.result([.empty])] : [.recent(recent)]
+            sections: recent.isEmpty ? [.recent([.emptyRecent])] : [.recent(items)]
         )
     }
     
@@ -172,7 +172,12 @@ final class SearchViewReactor: Reactor {
         case let .setRecent(recent):
             newState.recentKeywords = recent
             if newState.query.isEmpty {
-                newState.sections = recent.isEmpty ? [] : [.recent(recent)]
+                if recent.isEmpty {
+                    newState.sections = [.recent([.emptyRecent])]
+                } else {
+                    let items = recent.map { SearchSectionItem.recent($0) }
+                    newState.sections = [.recent(items)]
+                }
             }
 
         case let .setAutoComplete(auto):

@@ -44,7 +44,7 @@ extension SearchViewController {
                     let webVC = WebViewController(urlString: repo.htmlURL)
                     self?.navigationController?.pushViewController(webVC, animated: true)
                     
-                case .loading, .empty:
+                case .loading, .empty, .emptyRecent:
                     break
                 }
             })
@@ -101,8 +101,13 @@ private extension SearchViewController {
                     let cell = tableView.dequeue(Reusable.loadingCell, for: indexPath)
                     cell.configure()
                     return cell
+                    
                 case .empty:
                     let cell = tableView.dequeue(Reusable.emptyCell, for: indexPath)
+                    return cell
+                    
+                case .emptyRecent:
+                    let cell = tableView.dequeue(Reusable.recentEmptyCell, for: indexPath)
                     return cell
                 }
             }
@@ -149,7 +154,8 @@ extension SearchViewController: UITableViewDelegate {
 
         switch sections[section] {
         case .recent(let items):
-            return items.isEmpty ? 0 : 44
+            if items.count == 1, case .emptyRecent = items.first { return 0 }
+            return 44
         case .autoComplete:
             return 0
         case .result:
@@ -187,7 +193,8 @@ extension SearchViewController: UITableViewDelegate {
         
         switch sections[section] {
         case .recent(let items):
-            return items.isEmpty ? 0 : 44
+            if items.count == 1, case .emptyRecent = items.first { return 0 }
+            return 44
         default:
             return 0
         }
