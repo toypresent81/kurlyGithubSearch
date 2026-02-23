@@ -73,6 +73,7 @@ Feature
  │   │   ├─ SearchViewController+TableView
  │   │   ├─ SearchRecentCell
  │   │   ├─ SearchEmptyCell
+ │   │   ├─ SearchRecentEmptyCell
  │   │   ├─ SearchHeaderView
  │   │   ├─ SearchRecentFooterView
  │   │   └─ SearchResultCell
