@@ -14,13 +14,13 @@ final class SearchViewReactor: Reactor {
     
     // MARK: - Action
     enum Action {
-        case updateQuery(String)
-        case search(String)
-        case deleteRecent(String)
-        case deleteAllRecent
+        case updateQuery(String) // 검색 타이핑
+        case search(String) // 검색버튼
+        case deleteRecent(String) // 개별삭제
+        case deleteAllRecent // 전체삭제
         
-        case loadNextPage
-        case cancelSearch
+        case loadNextPage // 더보기
+        case cancelSearch // 취소 이벤트
     }
     
     // MARK: - Mutation
@@ -78,29 +78,31 @@ final class SearchViewReactor: Reactor {
         switch action {
             
         case let .updateQuery(query):
-            if query.isEmpty { // 검색어 지울 경우
-                let recent = localRepository.fetchRecent(count: Constant.recentFetchCount)
-                return .concat([
-                    .just(.setQuery(query)),
-                    .just(.setRepositories([], totalCount: 0, page: 1, append: false)),
-                    .just(.setRecent(recent))
-                ])
-            } else {
-                let autoComplete = localRepository.fetchAutocomplete(keyword: query)
-                return .concat([
-                    .just(.setQuery(query)),
-                    .just(.setAutoComplete(autoComplete))
-                ])
+            if query.isEmpty {
+                return mutate(action: .cancelSearch)
             }
+
+            let autoComplete = localRepository.fetchAutocomplete(keyword: query)
+            return .concat([
+                .just(.setQuery(query)),
+                .just(.setAutoComplete(autoComplete))
+            ])
             
-        case .search:
-            let query = currentState.query.trimmingCharacters(in: .whitespaces)
+        case let .search(rawQuery): // 검색 이벤트
+            let query = rawQuery.trimmingCharacters(in: .whitespaces)
             guard !query.isEmpty else { return .empty() }
             
             localRepository.save(keyword: query) // 최근검색에 저장
             
-            if let cachedRepos = searchResultCache[query], let totalCount = totalCountCache[query] { // 캐시확인
-                return .just(.setRepositories(cachedRepos, totalCount: totalCount, page: 1, append: false))
+            if let cachedRepos = searchResultCache[query], let totalCount = totalCountCache[query] {
+                return .concat([
+                    .just(.setQuery(query)), 
+                    .just(.setSearching(true)),
+                    .just(.setRepositories(cachedRepos,
+                                           totalCount: totalCount,
+                                           page: 1,
+                                           append: false))
+                ])
             }
                         
             return .concat([
@@ -118,26 +120,23 @@ final class SearchViewReactor: Reactor {
                 .just(.setLoading(false))
             ])
             
-        case let .deleteRecent(keyword):
+        case let .deleteRecent(keyword): // 개별삭제
             localRepository.delete(keyword: keyword)
             let recent = localRepository.fetchRecent(count: Constant.recentFetchCount)
             return .just(.setRecent(recent))
             
-        case .deleteAllRecent:
+        case .deleteAllRecent: // 전체삭제
             localRepository.deleteAll()
             return .just(.setRecent([]))
             
-        case .loadNextPage:
-            guard !currentState.isLoading, currentState.hasNextPage else {
-                return .empty()
-            }
+        case .loadNextPage: // 더보기
+            guard !currentState.isLoading, currentState.hasNextPage else { return .empty() }
             
             let nextPage = currentState.page + 1
             let query = currentState.query
             
             return .concat([
                 .just(.setLoading(true)),
-                
                 searchService.searchRepositories(keyword: query, page: nextPage)
                     .map { response in
                         Mutation.setRepositories(
@@ -150,12 +149,14 @@ final class SearchViewReactor: Reactor {
                     .asObservable(),
                     .just(.setLoading(false))
             ])
+            
         case .cancelSearch: // 서치바 취소 이벤트
             let recent = localRepository.fetchRecent(count: Constant.recentFetchCount)
 
             return .concat([
                 .just(.setQuery("")),
                 .just(.setSearching(false)),
+                .just(.setAutoComplete([])),
                 .just(.setRepositories([], totalCount: 0, page: 1, append: false)),
                 .just(.setRecent(recent))
             ])
@@ -171,31 +172,19 @@ final class SearchViewReactor: Reactor {
             
         case let .setRecent(recent):
             newState.recentKeywords = recent
-            if newState.query.isEmpty {
-                if recent.isEmpty {
-                    newState.sections = [.recent([.emptyRecent])]
-                } else {
-                    let items = recent.map { SearchSectionItem.recent($0) }
-                    newState.sections = [.recent(items)]
-                }
-            }
+            newState.sections = makeSections(for: newState)
 
         case let .setAutoComplete(auto):
             newState.autoCompleteKeywords = auto
-            if !newState.isSearching {
-                newState.sections = auto.isEmpty ? [] : [.autoComplete(auto)]
-            }
+            newState.sections = makeSections(for: newState)
 
         case let .setSearching(isSearching):
             newState.isSearching = isSearching
 
         case let .setLoading(isLoading):
             newState.isLoading = isLoading
-            
-            if !isLoading && newState.isSearching {
-                makeResultSection(state: &newState, isLoading: isLoading)
-            }
-            
+            newState.sections = makeSections(for: newState)
+
         case let .setRepositories(repos, totalCount, page, append):
             if append {
                 newState.repositories += repos
@@ -208,24 +197,47 @@ final class SearchViewReactor: Reactor {
 
             let maxCount = min(totalCount, 1000) // 검색 1000개 제한때문에 설정
             newState.hasNextPage = newState.repositories.count < maxCount
-            makeResultSection(state: &newState, isLoading: newState.isLoading)
+            newState.sections = makeSections(for: newState)
         }
-        
         return newState
     }
-    
-    private func makeResultSection(state: inout State, isLoading: Bool? = nil) {
-        let loadingState = isLoading ?? state.isLoading
-        var items: [SearchSectionItem] = []
+}
 
-        if state.repositories.isEmpty && !loadingState {
-            items = [.empty]
-        } else {
-            items = state.repositories.map { .result($0) }
-            if loadingState && state.hasNextPage {
-                items.append(.loading)
+// MARK: - Section 생성
+private extension SearchViewReactor {
+    private func makeSections(for state: State) -> [SearchSection] {
+        if state.isSearching { // 검색 실행 상태 → 결과 모드
+
+            if state.isLoading {
+                var items = state.repositories.map { SearchSectionItem.result($0) }
+                if state.hasNextPage {
+                    items.append(.loading)
+                }
+                return [.result(items)]
             }
+
+            if !state.repositories.isEmpty { // 결과 모드
+                var items = state.repositories.map { SearchSectionItem.result($0) }
+                if state.hasNextPage { // 더보기
+                    items.append(.loading)
+                }
+                return [.result(items)]
+            }
+
+            return [.result([.emptyResult])]
         }
-        state.sections = [.result(items)]
+
+        if !state.query.isEmpty { // 검색어는 있지만 아직 search 안 눌렀음 → autocomplete
+            let items = state.autoCompleteKeywords.map { SearchSectionItem.autoComplete($0) }
+            return [.autoComplete(items)]
+        }
+
+        // 최근 검색 리스트
+        if state.recentKeywords.isEmpty { // 저장된 검색어 없음
+            return [.recent([.emptyRecent])]
+        } else { // 저장된 검색어 있음
+            let items = state.recentKeywords.map { SearchSectionItem.recent($0) }
+            return [.recent(items)]
+        }
     }
 }

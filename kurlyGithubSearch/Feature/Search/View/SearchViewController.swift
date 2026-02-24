@@ -21,14 +21,14 @@ final class SearchViewController: UIViewController {
         $0.register(Reusable.searchRecentCell)
         $0.register(Reusable.searchResultCell)
         $0.register(Reusable.loadingCell)
-        $0.register(Reusable.emptyCell)
+        $0.register(Reusable.resultEmptyCell)
         $0.register(Reusable.recentEmptyCell)
     }
     struct Reusable {
         static let searchRecentCell = ReusableCell<SearchRecentCell>()
         static let searchResultCell = ReusableCell<SearchResultCell>()
         static let loadingCell = ReusableCell<LoadingCell>()
-        static let emptyCell = ReusableCell<SearchEmptyCell>()
+        static let resultEmptyCell = ReusableCell<SearchResultEmptyCell>()
         static let recentEmptyCell = ReusableCell<SearchRecentEmptyCell>()
     }
 
@@ -77,7 +77,7 @@ final class SearchViewController: UIViewController {
         if #available(iOS 26.0, *) {
             appearance.configureWithTransparentBackground() // Large Title 안보이는 이슈 수정
         } else {
-            // iOS 26이사 투명 배경이면 search bar 뒤쪽이 보여서 opaque 사용
+            // iOS 26이상 투명 배경이면 search bar 뒤쪽이 보여서 opaque 사용
             appearance.configureWithOpaqueBackground()
             appearance.backgroundColor = .systemBackground
         }

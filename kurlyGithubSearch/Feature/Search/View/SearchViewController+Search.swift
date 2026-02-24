@@ -17,13 +17,16 @@ extension SearchViewController {
         // 검색어 입력
         searchController.searchBar.rx.text.orEmpty
             .distinctUntilChanged()
-            .map { text -> SearchViewReactor.Action in
-                if text.isEmpty {
-                    return .cancelSearch
-                } else {
-                    return .updateQuery(text)
-                }
-            }
+            .filter { !$0.isEmpty }
+            .map { Reactor.Action.updateQuery($0) }
+            .bind(to: reactor.action)
+            .disposed(by: disposeBag)
+        
+        // 클리어버튼 이벤트
+        searchController.searchBar.searchTextField.rx.controlEvent(.editingChanged)
+            .withLatestFrom(searchController.searchBar.rx.text.orEmpty)
+            .filter { $0.isEmpty }
+            .map { _ in SearchViewReactor.Action.cancelSearch }
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
 
@@ -36,7 +39,7 @@ extension SearchViewController {
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
         
-        // 취소 버튼 클릭
+        // 취소 버튼 이벤트
         searchController.searchBar.rx.cancelButtonClicked
             .map { SearchViewReactor.Action.cancelSearch }
             .bind(to: reactor.action)

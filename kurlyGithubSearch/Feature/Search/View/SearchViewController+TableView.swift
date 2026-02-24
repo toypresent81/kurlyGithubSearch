@@ -32,7 +32,6 @@ extension SearchViewController {
                 case .recent(let entity):
                     guard let keyword = entity.keyword else { return }
                     self?.searchController.searchBar.text = keyword
-                    reactor.action.onNext(.updateQuery(keyword))
                     reactor.action.onNext(.search(keyword))
                     
                 case .autoComplete(let entity):
@@ -41,10 +40,10 @@ extension SearchViewController {
                     reactor.action.onNext(.search(keyword))
                     
                 case .result(let repo):
-                    let webVC = WebViewController(urlString: repo.htmlURL)
-                    self?.navigationController?.pushViewController(webVC, animated: true)
+                    let webViewController = WebViewController(urlString: repo.htmlURL)
+                    self?.navigationController?.pushViewController(webViewController, animated: true)
                     
-                case .loading, .empty, .emptyRecent:
+                case .loading, .emptyRecent, .emptyResult:
                     break
                 }
             })
@@ -102,8 +101,8 @@ private extension SearchViewController {
                     cell.configure()
                     return cell
                     
-                case .empty:
-                    let cell = tableView.dequeue(Reusable.emptyCell, for: indexPath)
+                case .emptyResult:
+                    let cell = tableView.dequeue(Reusable.resultEmptyCell, for: indexPath)
                     return cell
                     
                 case .emptyRecent:
@@ -154,7 +153,9 @@ extension SearchViewController: UITableViewDelegate {
 
         switch sections[section] {
         case .recent(let items):
-            if items.count == 1, case .emptyRecent = items.first { return 0 }
+            if items.count == 1, case .emptyRecent = items.first {
+                return 0
+            }
             return 44
         case .autoComplete:
             return 0
@@ -193,7 +194,9 @@ extension SearchViewController: UITableViewDelegate {
         
         switch sections[section] {
         case .recent(let items):
-            if items.count == 1, case .emptyRecent = items.first { return 0 }
+            if items.count == 1, case .emptyRecent = items.first {
+                return 0
+            }
             return 44
         default:
             return 0

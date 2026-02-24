@@ -52,14 +52,14 @@ final class SearchResultCell: BaseTableViewCell {
         if let url = URL(string: repository.owner.avatarURL) {
             thumbnailImageView.kf.setImage(
                 with: url,
-                placeholder: UIImage(systemName: "person.crop.circle"),
+                placeholder: UIImage(systemName: "folder.fill"),
                 options: [
                     .transition(.fade(0.2)),
                     .cacheOriginalImage
                 ]
             )
         } else {
-            thumbnailImageView.image = UIImage(systemName: "person.crop.circle")
+            thumbnailImageView.image = UIImage(systemName: "folder.fill")
         }
     }
 }

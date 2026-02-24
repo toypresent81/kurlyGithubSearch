@@ -12,8 +12,8 @@ import Then
 final class SearchHeaderView: BaseView {
     
     enum Style {
-        case recent
-        case result
+        case recent // 검색리스트
+        case result // 결과리스트
     }
     
     //MARK: - UI

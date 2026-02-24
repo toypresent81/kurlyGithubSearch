@@ -10,7 +10,7 @@ import SnapKit
 import Then
 import RxSwift
 
-final class SearchEmptyCell: BaseTableViewCell {
+final class SearchResultEmptyCell: BaseTableViewCell {
     
     //MARK: - UI
     private let messageLabel = UILabel().then {
@@ -28,7 +28,7 @@ final class SearchEmptyCell: BaseTableViewCell {
     }    
 }
 
-extension SearchEmptyCell {
+extension SearchResultEmptyCell {
     func setupUI() {
         contentView.addSubview(messageLabel)
     }
@@ -39,4 +39,3 @@ extension SearchEmptyCell {
         }
     }
 }
-

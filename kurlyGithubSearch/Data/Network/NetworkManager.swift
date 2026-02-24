@@ -42,8 +42,6 @@ final class NetworkManager: NetworkManagerType {
         
         return Single.create { single in
             
-            print("URL ::::::::::: \(url)")
-            print("parameters ::::::::::: \(parameters!)")
             guard let url = URL(string: url) else {
                 single(.failure(NetworkError.invalidURL))
                 return Disposables.create()
@@ -61,7 +59,6 @@ final class NetworkManager: NetworkManagerType {
                 
                 switch response.result {
                 case .success(let value):
-                    print("VALUE ::::::::::: \(value)")
                     single(.success(value))
                     
                 case .failure(let error):

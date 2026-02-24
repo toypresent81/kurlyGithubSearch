@@ -9,7 +9,7 @@ import RxDataSources
 
 enum SearchSection {
     case recent([SearchSectionItem])
-    case autoComplete([RecentSearchEntity])
+    case autoComplete([SearchSectionItem])
     case result([SearchSectionItem])
 }
 
@@ -21,7 +21,7 @@ extension SearchSection: SectionModelType {
         case .recent(let items):
             return items
         case .autoComplete(let items):
-            return items.map { .autoComplete($0) }
+            return items
         case .result(let items):
             return items
         }
@@ -32,10 +32,7 @@ extension SearchSection: SectionModelType {
         case .recent:
             self = .recent(items)
         case .autoComplete:
-            self = .autoComplete(items.compactMap {
-                if case let .autoComplete(entity) = $0 { return entity }
-                return nil
-            })
+            self = .autoComplete(items)
         case .result:
             self = .result(items)
         }
@@ -43,10 +40,10 @@ extension SearchSection: SectionModelType {
 }
 
 enum SearchSectionItem {
-    case recent(RecentSearchEntity)
-    case autoComplete(RecentSearchEntity)
-    case result(Repository)
-    case loading
-    case empty
-    case emptyRecent
+    case recent(RecentSearchEntity) // 검색리스트
+    case autoComplete(RecentSearchEntity) // 자동완성
+    case result(Repository) // 결과리스트
+    case loading // 로딩
+    case emptyRecent // 검색 없음
+    case emptyResult // 결과 없음
 }

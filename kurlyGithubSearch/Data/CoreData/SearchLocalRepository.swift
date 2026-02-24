@@ -20,6 +20,7 @@ final class SearchLocalRepository: SearchLocalRepositoryType {
     
     private let context = CoreDataManager.shared.context
     
+    //MARK: - 저장
     func save(keyword: String) {
         delete(keyword: keyword)
         
@@ -32,6 +33,7 @@ final class SearchLocalRepository: SearchLocalRepositoryType {
         CoreDataManager.shared.saveContext()
     }
     
+    //MARK: - 불러오기
     func fetchRecent(count: Int = Constant.recentFetchCount) -> [RecentSearchEntity] {
         let request: NSFetchRequest<RecentSearchEntity> = RecentSearchEntity.fetchRequest()
         request.sortDescriptors = [
@@ -42,6 +44,7 @@ final class SearchLocalRepository: SearchLocalRepositoryType {
         return (try? context.fetch(request)) ?? []
     }
     
+    //MARK: - 자동검색 불러오기
     func fetchAutocomplete(keyword: String) -> [RecentSearchEntity] {
         let request: NSFetchRequest<RecentSearchEntity> = RecentSearchEntity.fetchRequest()
         request.predicate = NSPredicate(format: "keyword CONTAINS[c] %@", keyword)
@@ -52,6 +55,7 @@ final class SearchLocalRepository: SearchLocalRepositoryType {
         return (try? context.fetch(request)) ?? []
     }
     
+    //MARK: - 개별검색삭제
     func delete(keyword: String) {
         let request: NSFetchRequest<RecentSearchEntity> = RecentSearchEntity.fetchRequest()
         request.predicate = NSPredicate(format: "keyword == %@", keyword)
@@ -62,6 +66,7 @@ final class SearchLocalRepository: SearchLocalRepositoryType {
         }
     }
     
+    //MARK: - 전체검색삭제
     func deleteAll() {
         let request: NSFetchRequest<NSFetchRequestResult> = RecentSearchEntity.fetchRequest()
         let deleteRequest = NSBatchDeleteRequest(fetchRequest: request)
