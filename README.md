@@ -1,6 +1,7 @@
 # KurlyGithubSearch
 
 iOS용 GitHub 저장소 검색 사전과제입니다.  
+(iOS26에서 SearchViewController UI 변경으로 인해 iOS 26미만 버전에서 동일한 UI로 확인하실 수 있습니다.)
 
 ---
 
@@ -72,7 +73,7 @@ Feature
  │   │   ├─ SearchViewController+Search
  │   │   ├─ SearchViewController+TableView
  │   │   ├─ SearchRecentCell
- │   │   ├─ SearchEmptyCell
+ │   │   ├─ SearchResultEmptyCell
  │   │   ├─ SearchRecentEmptyCell
  │   │   ├─ SearchHeaderView
  │   │   ├─ SearchRecentFooterView
